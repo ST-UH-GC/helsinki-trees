@@ -1,0 +1,187 @@
+{
+  "dataset_name": "helsingin-kaupungin-puurekisteri",
+  "metadata_modified": "2025-04-16T11:18:37.301822",
+  "license": "Creative Commons Attribution 4.0",
+  "license_id": "cc-by-4.0",
+  "getfeature_output_formats": [
+    "application/gml+xml; version=3.2",
+    "GML2",
+    "KML",
+    "SHAPE-ZIP",
+    "application/geo+json",
+    "application/json",
+    "application/stac+json",
+    "application/vnd.google-earth.kml xml",
+    "application/vnd.google-earth.kml+xml",
+    "application/vnd.ogc.fg+json",
+    "csv",
+    "gml3",
+    "gml32",
+    "json",
+    "text/csv",
+    "text/javascript",
+    "text/xml; subtype=gml/2.1.2",
+    "text/xml; subtype=gml/3.1.1",
+    "text/xml; subtype=gml/3.2"
+  ],
+  "layer_name": "avoindata:Puurekisteri_piste",
+  "default_crs": "urn:ogc:def:crs:EPSG::3879",
+  "other_crs": [
+    "urn:ogc:def:crs:EPSG::3067",
+    "urn:ogc:def:crs:EPSG::4326",
+    "urn:ogc:def:crs:EPSG::3857"
+  ],
+  "wgs84_bbox": {
+    "lower": "24.764732945863038 60.0080107531311",
+    "upper": "25.289558715996222 60.322459856333225"
+  },
+  "number_matched": 58561,
+  "schema_fields": [
+    {
+      "name": "id",
+      "type": "xsd:int"
+    },
+    {
+      "name": "tunnus",
+      "type": "xsd:string"
+    },
+    {
+      "name": "kadunnimi",
+      "type": "xsd:string"
+    },
+    {
+      "name": "puistonnimi",
+      "type": "xsd:string"
+    },
+    {
+      "name": "paatyyppi",
+      "type": "xsd:string"
+    },
+    {
+      "name": "suomenknimi",
+      "type": "xsd:string"
+    },
+    {
+      "name": "suku",
+      "type": "xsd:string"
+    },
+    {
+      "name": "laji",
+      "type": "xsd:string"
+    },
+    {
+      "name": "kokoluokka",
+      "type": "xsd:string"
+    },
+    {
+      "name": "istutusvuosi",
+      "type": "xsd:int"
+    },
+    {
+      "name": "datanomistaja",
+      "type": "xsd:string"
+    },
+    {
+      "name": "paivitetty_tietopalveluun",
+      "type": "xsd:date"
+    },
+    {
+      "name": "geom",
+      "type": "gml:GeometryPropertyType"
+    }
+  ],
+  "full_csv_rows": 58561,
+  "columns": [
+    "FID",
+    "id",
+    "tunnus",
+    "kadunnimi",
+    "puistonnimi",
+    "paatyyppi",
+    "suomenknimi",
+    "suku",
+    "laji",
+    "kokoluokka",
+    "istutusvuosi",
+    "datanomistaja",
+    "paivitetty_tietopalveluun",
+    "geom"
+  ],
+  "missingness": {
+    "id": {
+      "missing": 0,
+      "pct": 0.0
+    },
+    "tunnus": {
+      "missing": 0,
+      "pct": 0.0
+    },
+    "paatyyppi": {
+      "missing": 0,
+      "pct": 0.0
+    },
+    "suomenknimi": {
+      "missing": 5,
+      "pct": 0.01
+    },
+    "suku": {
+      "missing": 0,
+      "pct": 0.0
+    },
+    "laji": {
+      "missing": 1,
+      "pct": 0.0
+    },
+    "kokoluokka": {
+      "missing": 8548,
+      "pct": 14.6
+    },
+    "istutusvuosi": {
+      "missing": 43192,
+      "pct": 73.76
+    },
+    "kadunnimi": {
+      "missing": 32276,
+      "pct": 55.12
+    },
+    "puistonnimi": {
+      "missing": 26797,
+      "pct": 45.76
+    },
+    "geom": {
+      "missing": 0,
+      "pct": 0.0
+    },
+    "paivitetty_tietopalveluun": {
+      "missing": 0,
+      "pct": 0.0
+    }
+  },
+  "paatyyppi_distribution": [
+    [
+      "Puisto",
+      31981
+    ],
+    [
+      "Katu",
+      26243
+    ],
+    [
+      "Täydennys",
+      337
+    ]
+  ],
+  "istutusvuosi_stats": {
+    "non_empty": 15369,
+    "min": 0,
+    "max": 20100,
+    "invalid_or_implausible_count": 14
+  },
+  "geometry_parse": {
+    "parsed": 58561,
+    "lat_min": 60.141081469482515,
+    "lat_max": 60.288373513591004,
+    "lon_min": 24.833407864875827,
+    "lon_max": 25.198375486645542
+  }
+}
