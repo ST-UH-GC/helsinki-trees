@@ -5,7 +5,7 @@ Standalone, bilingual (FI/EN) map build for Helsinki urban tree data.
 ## Build
 
 ```bash
-cd /Users/tkalcan/Codex/HKI\ City\ API/helsinki-trees
+# from the repository root
 make build
 ```
 
