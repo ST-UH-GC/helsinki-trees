@@ -523,7 +523,7 @@ def build_html(data_json: str) -> str:
       position: absolute;
       top: 22px;
       right: 22px;
-      z-index: 845;
+      z-index: 1080;
       display: flex;
       gap: 8px;
     }}
@@ -564,7 +564,7 @@ def build_html(data_json: str) -> str:
       padding: 12px;
       display: none;
       gap: 10px;
-      z-index: 840;
+      z-index: 1100;
     }}
 
     .settings-drawer.open {{
@@ -581,7 +581,7 @@ def build_html(data_json: str) -> str:
       opacity: 0;
       pointer-events: none;
       transition: opacity 160ms ease;
-      z-index: 835;
+      z-index: 1090;
     }}
 
     .settings-scrim.open {{
