@@ -407,6 +407,19 @@ def build_html(data_json: str) -> str:
       line-height: 1.35;
     }}
 
+    .range-wrap {{
+      display: grid;
+      gap: 5px;
+    }}
+
+    input[type="range"] {{
+      min-height: 36px;
+      padding: 0;
+      accent-color: var(--primary);
+      border: 0;
+      background: transparent;
+    }}
+
     .panel-body {{
       min-height: 0;
       overflow-y: auto;
@@ -822,6 +835,13 @@ def build_html(data_json: str) -> str:
             <span class=\"control-label\" id=\"label-size\"></span>
           </label>
           <select id=\"filter-size\"></select>
+          <div class=\"range-wrap\">
+            <label for=\"filter-year\">
+              <span class=\"control-label\" id=\"label-year\"></span>
+            </label>
+            <input id=\"filter-year\" type=\"range\" min=\"0\" max=\"0\" step=\"1\" value=\"0\" />
+            <p id=\"year-readout\" class=\"assist-text\"></p>
+          </div>
           <button id=\"btn-reset\" type=\"button\"></button>
           <div id=\"status\" class=\"status\" role=\"status\" aria-live=\"polite\"></div>
           <p id=\"map-help\" class=\"assist-text\"></p>
@@ -995,6 +1015,9 @@ def build_html(data_json: str) -> str:
         labelSpecies: "Laji (suomi)",
         labelGenus: "Suku",
         labelSize: "Rungon paksuusluokka",
+        labelYear: "Istutusvuoden aikajana",
+        yearReadout: "Nayta kohteet vuoteen {{year}} asti. Tuntemattomat vuodet sisaltyvat aina.",
+        yearUnavailable: "Istutusvuosidata puuttuu aikajanaliukuria varten.",
         reset: "Tyhjenna suodattimet",
         all: "Kaikki",
         status: "Nakyvissa: {{count}} / {{total}}",
@@ -1055,6 +1078,9 @@ def build_html(data_json: str) -> str:
         labelSpecies: "Species (Finnish)",
         labelGenus: "Genus",
         labelSize: "Trunk diameter class",
+        labelYear: "Planting year timeline",
+        yearReadout: "Show items up to year {{year}}. Unknown years are always included.",
+        yearUnavailable: "No planting-year data available for timeline slider.",
         reset: "Reset filters",
         all: "All",
         status: "Visible: {{count}} / {{total}}",
@@ -1104,6 +1130,12 @@ def build_html(data_json: str) -> str:
     const meta = TREE_DATA.meta;
     const rows = TREE_DATA.rows;
     const filters = TREE_DATA.filters;
+    const plantingYears = rows
+      .map((row) => Number(row[7]))
+      .filter((year) => Number.isInteger(year) && year > 1000);
+    const yearRange = plantingYears.length > 0
+      ? {{ min: Math.min(...plantingYears), max: Math.max(...plantingYears) }}
+      : null;
 
     const STORAGE_KEY = "helsinkiTreesBetaPrefsV1";
     const defaultLang = (navigator.language || "").toLowerCase().startsWith("fi") ? "fi" : "en";
@@ -1150,6 +1182,7 @@ def build_html(data_json: str) -> str:
       settingsOpen: false,
       renderToken: 0,
       speciesSearch: "",
+      yearCutoff: yearRange ? yearRange.max : null,
       themeMode: (savedPrefs.theme === "day" || savedPrefs.theme === "night" || savedPrefs.theme === "system") ? savedPrefs.theme : "system",
       contrastHigh: Boolean(savedPrefs.contrastHigh),
       hideIntro: Boolean(savedPrefs.hideIntro),
@@ -1194,10 +1227,13 @@ def build_html(data_json: str) -> str:
       labelSpecies: document.getElementById("label-species"),
       labelGenus: document.getElementById("label-genus"),
       labelSize: document.getElementById("label-size"),
+      labelYear: document.getElementById("label-year"),
       btnReset: document.getElementById("btn-reset"),
       status: document.getElementById("status"),
       mapHelp: document.getElementById("map-help"),
       filterSpeciesSearch: document.getElementById("filter-species-search"),
+      filterYear: document.getElementById("filter-year"),
+      yearReadout: document.getElementById("year-readout"),
       detailTitle: document.getElementById("detail-title"),
       detailGrid: document.getElementById("detail-grid"),
       qualityNote: document.getElementById("quality-note"),
@@ -1341,6 +1377,37 @@ def build_html(data_json: str) -> str:
         }}
         activeTileLayer = targetLayer;
       }}
+    }}
+
+    function syncYearFilterUi() {{
+      if (!dom.filterYear || !dom.yearReadout || !dom.labelYear) return;
+      dom.labelYear.textContent = t("labelYear");
+
+      if (!yearRange) {{
+        dom.filterYear.disabled = true;
+        dom.filterYear.value = "0";
+        dom.filterYear.setAttribute("aria-label", t("yearUnavailable"));
+        dom.yearReadout.textContent = t("yearUnavailable");
+        return;
+      }}
+
+      if (!Number.isInteger(state.yearCutoff)) {{
+        state.yearCutoff = yearRange.max;
+      }}
+      if (state.yearCutoff < yearRange.min) state.yearCutoff = yearRange.min;
+      if (state.yearCutoff > yearRange.max) state.yearCutoff = yearRange.max;
+
+      dom.filterYear.disabled = false;
+      dom.filterYear.min = String(yearRange.min);
+      dom.filterYear.max = String(yearRange.max);
+      dom.filterYear.step = "1";
+      dom.filterYear.value = String(state.yearCutoff);
+      dom.filterYear.setAttribute("aria-label", t("labelYear"));
+      dom.filterYear.setAttribute("aria-valuemin", String(yearRange.min));
+      dom.filterYear.setAttribute("aria-valuemax", String(yearRange.max));
+      dom.filterYear.setAttribute("aria-valuenow", String(state.yearCutoff));
+      dom.filterYear.setAttribute("aria-valuetext", String(state.yearCutoff));
+      dom.yearReadout.textContent = format(t("yearReadout"), {{ year: state.yearCutoff }});
     }}
 
     function syncSettingsDrawerState() {{
@@ -1495,6 +1562,7 @@ def build_html(data_json: str) -> str:
       dom.labelSpecies.textContent = t("labelSpecies");
       dom.labelGenus.textContent = t("labelGenus");
       dom.labelSize.textContent = t("labelSize");
+      dom.labelYear.textContent = t("labelYear");
       dom.btnReset.textContent = t("reset");
       dom.mapHelp.textContent = t("mapHelp");
       dom.qualityNote.textContent = t("qualityNote");
@@ -1511,6 +1579,7 @@ def build_html(data_json: str) -> str:
       document.getElementById("filter-species").setAttribute("aria-label", t("labelSpecies"));
       document.getElementById("filter-genus").setAttribute("aria-label", t("labelGenus"));
       document.getElementById("filter-size").setAttribute("aria-label", t("labelSize"));
+      if (dom.filterYear) dom.filterYear.setAttribute("aria-label", t("labelYear"));
       dom.settingsLanguageLabel.textContent = t("settingsLanguage");
       dom.settingsThemeLabel.textContent = t("settingsTheme");
       if (dom.settingsTheme && dom.settingsTheme.options.length >= 3) {{
@@ -1547,6 +1616,7 @@ def build_html(data_json: str) -> str:
       syncSettingsControls();
       syncSettingsDrawerState();
       syncPanelState();
+      syncYearFilterUi();
 
       fillFilters();
       if (state.selectedRow) {{
@@ -1588,6 +1658,10 @@ def build_html(data_json: str) -> str:
     }}
 
     function rowMatches(row) {{
+      if (yearRange && Number.isInteger(state.yearCutoff)) {{
+        const plantingYear = Number(row[7]);
+        if (Number.isInteger(plantingYear) && plantingYear > state.yearCutoff) return false;
+      }}
       if (state.speciesSearch && !speciesSearchText(row).includes(state.speciesSearch)) return false;
       if (state.filterValues.paatyyppi && row[2] !== state.filterValues.paatyyppi) return false;
       if (state.filterValues.suomenknimi && row[3] !== state.filterValues.suomenknimi) return false;
@@ -1755,6 +1829,10 @@ def build_html(data_json: str) -> str:
         if (dom.filterSpeciesSearch) {{
           dom.filterSpeciesSearch.value = "";
         }}
+        if (yearRange) {{
+          state.yearCutoff = yearRange.max;
+          syncYearFilterUi();
+        }}
         state.filterValues = {{
           paatyyppi: "",
           suomenknimi: "",
@@ -1768,6 +1846,18 @@ def build_html(data_json: str) -> str:
       if (dom.filterSpeciesSearch) {{
         dom.filterSpeciesSearch.addEventListener("input", (event) => {{
           state.speciesSearch = normalizeSearch(event.target.value);
+          applyFiltersAndRender();
+        }});
+      }}
+
+      if (dom.filterYear) {{
+        dom.filterYear.addEventListener("input", (event) => {{
+          state.yearCutoff = Number(event.target.value);
+          syncYearFilterUi();
+        }});
+        dom.filterYear.addEventListener("change", (event) => {{
+          state.yearCutoff = Number(event.target.value);
+          syncYearFilterUi();
           applyFiltersAndRender();
         }});
       }}
